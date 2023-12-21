@@ -1,8 +1,8 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { Link, useMatch, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { createProfile, getCurrentProfile } from '../../actions/profile';
+import { useDispatch, useSelector } from 'react-redux';
 
 /*
   NOTE: declare initialState outside of component
@@ -24,11 +24,12 @@ const initialState = {
   instagram: ''
 };
 
-const ProfileForm = ({
-  profile: { profile, loading },
-  createProfile,
-  getCurrentProfile
-}) => {
+const ProfileForm = () => {
+  const dispatch = useDispatch();
+  const [profile, loading] = useSelector((state) => [
+    state.profile.profile,
+    state.profile.loading
+  ]);
   const [formData, setFormData] = useState(initialState);
 
   const creatingProfile = useMatch('/create-profile');
@@ -39,7 +40,7 @@ const ProfileForm = ({
 
   useEffect(() => {
     // if there is no profile, attempt to fetch one
-    if (!profile) getCurrentProfile();
+    if (!profile) dispatch(getCurrentProfile());
 
     // if we finished loading and we do have a profile
     // then build our profileData
@@ -57,7 +58,7 @@ const ProfileForm = ({
       // set local state with the profileData
       setFormData(profileData);
     }
-  }, [loading, getCurrentProfile, profile]);
+  }, [dispatch, loading, profile]);
 
   const {
     company,
@@ -80,7 +81,7 @@ const ProfileForm = ({
   const onSubmit = (e) => {
     const editing = profile ? true : false;
     e.preventDefault();
-    createProfile(formData, editing).then(() => {
+    dispatch(createProfile(formData, editing)).then(() => {
       if (!editing) navigate('/dashboard');
     });
   };
@@ -270,10 +271,4 @@ ProfileForm.propTypes = {
   profile: PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) => ({
-  profile: state.profile
-});
-
-export default connect(mapStateToProps, { createProfile, getCurrentProfile })(
-  ProfileForm
-);
+export default ProfileForm;
