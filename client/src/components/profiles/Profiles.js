@@ -1,14 +1,19 @@
 import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import Spinner from '../layout/Spinner';
 import ProfileItem from './ProfileItem';
 import { getProfiles } from '../../actions/profile';
+import { useDispatch, useSelector } from 'react-redux';
 
-const Profiles = ({ getProfiles, profile: { profiles, loading } }) => {
+const Profiles = () => {
+  const dispatch = useDispatch();
+  const [profiles, loading] = useSelector((state) => [
+    state.profile.profiles,
+    state.profile.loading
+  ]);
   useEffect(() => {
-    getProfiles();
-  }, [getProfiles]);
+    dispatch(getProfiles());
+  }, [dispatch]);
 
   return (
     <section className="container">
@@ -41,8 +46,4 @@ Profiles.propTypes = {
   profile: PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) => ({
-  profile: state.profile
-});
-
-export default connect(mapStateToProps, { getProfiles })(Profiles);
+export default Profiles;
