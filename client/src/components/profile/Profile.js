@@ -1,7 +1,6 @@
 import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useParams } from 'react-router-dom';
-import { connect } from 'react-redux';
 import Spinner from '../layout/Spinner';
 import ProfileTop from './ProfileTop';
 import ProfileAbout from './ProfileAbout';
@@ -9,12 +8,21 @@ import ProfileExperience from './ProfileExperience';
 import ProfileEducation from './ProfileEducation';
 import ProfileGithub from './ProfileGithub';
 import { getProfileById } from '../../actions/profile';
+import { useDispatch, useSelector } from 'react-redux';
 
-const Profile = ({ getProfileById, profile: { profile }, auth }) => {
+const Profile = () => {
+  const dispatch = useDispatch();
   const { id } = useParams();
+
+  const [profile, auth] = useSelector((state) => [
+    state.profile.profile,
+    state.auth
+  ]);
+  // const auth = useSelector((state) => state.auth);
+
   useEffect(() => {
-    getProfileById(id);
-  }, [getProfileById, id]);
+    dispatch(getProfileById(id));
+  }, [dispatch, id]);
 
   return (
     <section className="container">
@@ -83,9 +91,4 @@ Profile.propTypes = {
   auth: PropTypes.object.isRequired
 };
 
-const mapStateToProps = (state) => ({
-  profile: state.profile,
-  auth: state.auth
-});
-
-export default connect(mapStateToProps, { getProfileById })(Profile);
+export default Profile;
